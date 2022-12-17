@@ -69,7 +69,7 @@ router.get("/event/", deleteEvent);
   offset:00
  }
  */
-router.post("/updateregister/:id", updateRegisteruser);
+router.put("/register/:id", updateRegisteruser);
 /** update a clock under the user route 
  expet a query uid=""&cid=""
   & {
@@ -78,7 +78,7 @@ router.post("/updateregister/:id", updateRegisteruser);
   offset:00
  }
  */
-router.post("/updateclock", updateClock);
+router.put("/clock", updateClock);
 /** update a event under the user route 
  expet a query uid=""&eid=""
   & {
@@ -88,5 +88,5 @@ router.post("/updateclock", updateClock);
   date:"",
  }
  */
-router.post("/updateevent", updateEvent);
+router.put("/event", updateEvent);
 module.exports = router;
