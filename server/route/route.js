@@ -8,6 +8,7 @@ const {
   updateClock,
   updateEvent,
   login,
+  getdata,
 } = require("../db/controller/userController");
 
 const router = require("express").Router();
@@ -18,11 +19,11 @@ const router = require("express").Router();
 #############################################################
 #############################################
 */
+router.get("/:id", getdata);
 /** register a new user route 
  expet an object like {
- timezone:"",
- offset: 00,
- tittle:""
+name:"",
+password:""
  }
  */
 router.post("/register", registeruser);
@@ -56,11 +57,11 @@ router.post("/event/:id", createEvent);
 /** delete a clock under the user route 
  expet a query uid=""&cid=""
  */
-router.get("/clock/", deleteClock);
+router.delete("/clock/", deleteClock);
 /** delete a event under the user route 
  expet a query uid=""&eid=""
  */
-router.get("/event/", deleteEvent);
+router.delete("/event/", deleteEvent);
 /** update the user under user route 
  expet a id params
  & {

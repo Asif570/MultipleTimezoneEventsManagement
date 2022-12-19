@@ -1,4 +1,12 @@
 const User = require("../model/model");
+const getdata = async (req, res) => {
+  try {
+    const data = await User.findOne({ _id: req.params.id });
+    res.status(200).json({ result: data, massege: "Found" });
+  } catch (error) {
+    res.status(404).json({ massege: "Not Found" });
+  }
+};
 // Login controller here
 //####################################
 //$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
@@ -9,12 +17,14 @@ const login = async (req, res) => {
       if (result.password === req.body.password) {
         res.status(200).json({ message: "User Found", result: result });
       } else {
-        res.status(405).json({ message: "Invalid Name or Password" });
+        res.status(200).json({ message: "Invalid Name or Password" });
       }
     } else {
-      res.status(405).json({ message: "User Not Exsist" });
+      res.status(200).json({ message: "User Not Exsist" });
     }
-  } catch (error) {}
+  } catch (error) {
+    res.status(200).json({ message: "Somthing Wrong" });
+  }
 };
 // All create controller here
 //####################################
@@ -23,15 +33,12 @@ const registeruser = async (req, res) => {
   const data = new User({
     name: req.body.name,
     password: req.body.password,
-    tittle: req.body.tittle,
-    timezone: req.body.timezone,
-    offset: req.body.offset,
   });
   data.save(async (error) => {
     if (error) {
       res.status(501).json({ message: "Not Save" });
     } else {
-      const result = await User.find({ name: req.body.name });
+      const result = await User.findOne({ name: req.body.name });
       res.status(201).json({ message: " Saved", result: result });
     }
   });
@@ -45,7 +52,6 @@ const createClock = async (req, res) => {
       {
         $push: {
           clocks: {
-            clock_id: req.body.id,
             clock_tittle: req.body.tittle,
             clock_timezone: req.body.timezone,
             clock_offset: req.body.offset,
@@ -94,7 +100,7 @@ const deleteClock = async (req, res) => {
       {
         $pull: {
           clocks: {
-            clock_id: req.query.cid,
+            _id: req.query.cid,
           },
         },
       }
@@ -115,7 +121,7 @@ const deleteEvent = async (req, res) => {
       {
         $pull: {
           events: {
-            clock_id: req.query.eid,
+            _id: req.query.eid,
           },
         },
       }
@@ -131,20 +137,38 @@ const deleteEvent = async (req, res) => {
 //$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
 const updateRegisteruser = async (req, res) => {
   try {
-    await User.update(
-      {
-        _id: req.params.id,
-      },
-      {
-        $set: {
-          tittle: req.body.tittle,
-          name: req.body.name,
-          password: req.body.password,
-        },
-      }
-    );
     const user = await User.findOne({ _id: req.params.id });
-    res.status(202).json({ message: "Updated", result: user });
+    if (req.body.Npassword) {
+      if (user.password === req.body.password) {
+        await User.update(
+          {
+            _id: req.params.id,
+          },
+          {
+            $set: {
+              tittle: req.body.tittle,
+              name: req.body.name,
+              password: req.body.Npassword,
+            },
+          }
+        );
+      } else {
+        res.status(202).json({ message: "Wrong Old Password " });
+      }
+    } else {
+      await User.update(
+        {
+          _id: req.params.id,
+        },
+        {
+          $set: {
+            tittle: req.body.tittle,
+            name: req.body.name,
+          },
+        }
+      );
+      res.status(202).json({ message: "Updated", result: user });
+    }
   } catch (error) {
     res.status(402).json({ message: "Wrong" });
   }
@@ -152,7 +176,7 @@ const updateRegisteruser = async (req, res) => {
 const updateClock = async (req, res) => {
   try {
     await User.update(
-      { "clocks.clock_id": req.query.cid },
+      { "clocks._id": req.query.cid },
       {
         $set: {
           "clocks.$.clock_tittle": req.body.tittle,
@@ -199,4 +223,5 @@ module.exports = {
   updateClock,
   updateEvent,
   login,
+  getdata,
 };
